@@ -1,0 +1,34 @@
+/* Sort the DataFrame by ContractNumber and EffectiveDate */
+proc sort data=YourDataFrame;
+  by ContractNumber EffectiveDate;
+run;
+
+/* Create a new DataFrame with forward filled values */
+data ForwardFilledDataFrame;
+  set YourDataFrame;
+  by ContractNumber EffectiveDate;
+
+  /* Retain the last non-missing values within the same ContractNumber */
+  retain LastCompanyName LastEffectiveDate;
+
+  /* Update the retained values */
+  if first.ContractNumber then do;
+    LastCompanyName = CompanyName;
+    LastEffectiveDate = EffectiveDate;
+  end;
+
+  /* Forward fill missing values with the retained values */
+  if missing(CompanyName) then CompanyName = LastCompanyName;
+  if missing(EffectiveDate) then EffectiveDate = LastEffectiveDate;
+
+  /* Output the updated row */
+  output;
+  
+  /* Clear retained values for the next iteration */
+  if last.ContractNumber then call missing(LastCompanyName, LastEffectiveDate);
+run;
+
+/* Sort the ForwardFilledDataFrame by ContractNumber and EffectiveDate if necessary */
+proc sort data=ForwardFilledDataFrame;
+  by ContractNumber EffectiveDate;
+run;
