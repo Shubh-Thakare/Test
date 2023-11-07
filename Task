@@ -146,5 +146,41 @@ duplicates_mask = df['column_with_duplicates'].duplicated(keep='first')
 df.drop_duplicates(subset='column_with_duplicates', keep='first', inplace=True, ignore_index=True)
 
 # Output the final DataFrame
-print(df)
+print(df
 
+
+
+
+
+
+
+import pandas as pd
+
+# Sample DataFrame (replace this with your actual DataFrame)
+data = {
+    'contract': ['A', 'A', 'B', 'B', 'B', 'C', 'C', 'C'],
+    'date': ['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-06', '2023-01-07', '2023-01-08'],
+    'value': [10, 15, 20, 20, 25, 30, 35, 40]
+}
+
+df = pd.DataFrame(data)
+
+# Identify duplicates in the 'contract' column
+duplicates_mask = df['contract'].duplicated(keep='first')
+
+# Iterate through the DataFrame and drop duplicates based on the specified conditions
+rows_to_drop = []
+for i in range(len(df)):
+    if duplicates_mask[i]:
+        # Check if the duplicate values are continuous
+        if df['contract'][i] == df['contract'][i - 1]:
+            rows_to_drop.append(i)
+    else:
+        # Reset the continuous duplicates flag
+        continuous_duplicates = False
+
+# Drop the identified duplicate rows
+df_cleaned = df.drop(rows_to_drop)
+
+# Output the cleaned DataFrame
+print(df_cleaned)
