@@ -60,3 +60,30 @@ df['is_duplicate'] = df['is_duplicate'] & df['is_duplicate'].shift(-1, fill_valu
 result_df = df[~df['is_duplicate']].drop(columns=['is_duplicate'])
 
 print(result_df)
+
+
+
+
+import pandas as pd
+
+# Sample DataFrame
+data = {
+    'date': ['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-05'],
+    'value': [1, 2, 3, 3, 4, 5, 5]
+}
+
+df = pd.DataFrame(data)
+
+# Convert the 'date' column to datetime
+df['date'] = pd.to_datetime(df['date'])
+
+# Step 1: Sort the DataFrame by the 'date' column
+df.sort_values(by='date', inplace=True)
+
+# Step 2: Identify duplicates in the 'value' column
+duplicates_mask = df['value'].duplicated(keep='first')
+
+# Step 3: Keep the first row of each set of continuous duplicates and drop the rest
+result_df = df[~(duplicates_mask & duplicates_mask.shift(-1))]
+
+print(result_df)
