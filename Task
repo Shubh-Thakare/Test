@@ -87,3 +87,33 @@ duplicates_mask = df['value'].duplicated(keep='first')
 result_df = df[~(duplicates_mask & duplicates_mask.shift(-1))]
 
 print(result_df)
+
+
+
+
+
+
+
+import pandas as pd
+
+# Sample DataFrame (replace this with your actual DataFrame)
+data = {
+    'date': ['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-04', '2023-01-06', '2023-01-07'],
+    'value': [1, 2, 3, 4, 4, 6, 7]
+}
+
+df = pd.DataFrame(data)
+
+# Convert the 'date' column to datetime
+df['date'] = pd.to_datetime(df['date'])
+
+# Sort the DataFrame by the 'date' column
+df.sort_values(by='date', inplace=True)
+
+# Identify duplicates in the 'value' column
+duplicates_mask = df['value'].duplicated(keep=False)
+
+# Keep the first occurrence of duplicates if they are in continuous rows; otherwise, keep all duplicates
+result_df = df.drop_duplicates(subset='value', keep='first' if duplicates_mask.all() else False)
+
+print(result_df)
