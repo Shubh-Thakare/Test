@@ -1,4 +1,4 @@
-/* Sort the DataFrame by ContractNumber and EffectiveDate */
+hii/* Sort the DataFrame by ContractNumber and EffectiveDate */
 proc sort data=YourDataFrame;
   by ContractNumber EffectiveDate;
 run;
@@ -117,3 +117,34 @@ duplicates_mask = df['value'].duplicated(keep=False)
 result_df = df.drop_duplicates(subset='value', keep='first' if duplicates_mask.all() else False)
 
 print(result_df)
+
+
+
+
+
+
+
+
+
+import pandas as pd
+
+# Sample DataFrame (replace this with your actual DataFrame)
+data = {
+    'date': ['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-06'],
+    'column_with_duplicates': ['A', 'B', 'B', 'C', 'C', 'D']
+}
+
+df = pd.DataFrame(data)
+
+# Step 1: Sort the DataFrame by the date column
+df.sort_values(by='date', inplace=True)
+
+# Step 2: Identify duplicates in the specified column
+duplicates_mask = df['column_with_duplicates'].duplicated(keep='first')
+
+# Step 3: Keep the first occurrence of duplicates only if they appear in continuous rows
+df.drop_duplicates(subset='column_with_duplicates', keep='first', inplace=True, ignore_index=True)
+
+# Output the final DataFrame
+print(df)
+
