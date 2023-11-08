@@ -327,3 +327,44 @@ value_axis.has_major_gridlines = True
 
 # Save the modified presentation
 prs.save('path/to/modified_presentation.pptx')
+
+
+
+
+
+
+
+import pandas as pd
+from pptx import Presentation
+from pptx.util import Inches
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE
+
+# Read data into a DataFrame (replace 'data.csv' with your DataFrame)
+data = pd.read_csv('data.csv')
+
+# Create a PowerPoint presentation object from an existing file
+presentation = Presentation('existing_presentation.pptx')
+
+# Create a slide for the bar chart
+slide_layout = presentation.slide_layouts[5]  # You can choose a different layout if needed
+slide = presentation.slides.add_slide(slide_layout)
+
+# Define chart data
+chart_data = CategoryChartData()
+chart_data.categories = list(data['Category'])  # Replace 'Category' with your column name
+chart_data.add_series('Series Name', (list(data['Value']),))  # Replace 'Value' with your column name
+
+# Add a bar chart to the slide
+x, y, cx, cy = Inches(2), Inches(2), Inches(6), Inches(4.5)  # Adjust the position and size of the chart
+chart = slide.shapes.add_chart(
+    XL_CHART_TYPE.BAR_CLUSTERED, x, y, cx, cy, chart_data
+).chart
+
+# Customize the appearance of the chart if needed
+# chart.has_legend = True
+# chart.legend.position = XL_LEGEND_POSITION.BOTTOM
+
+# Save the modified presentation
+presentation.save('modified_presentation.pptx')
+
