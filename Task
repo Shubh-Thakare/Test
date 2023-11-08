@@ -267,3 +267,63 @@ st.pyplot(plt)
 if st.button('Click me!'):
     st.write('Button clicked!')
 
+
+
+
+
+
+
+
+
+
+import pandas as pd
+from pptx import Presentation
+from pptx.util import Inches
+from pptx.enum.text import PP_ALIGN
+from pptx.enum.chart import XL_CHART_TYPE
+
+# Load your DataFrame (example)
+data = {
+    'Category': ['A', 'B', 'C', 'D'],
+    'Value': [10, 15, 8, 12]
+}
+df = pd.DataFrame(data)
+
+# Load the existing PowerPoint presentation
+presentation_path = 'path/to/your/presentation.pptx'
+prs = Presentation(presentation_path)
+
+# Create a slide for the chart
+slide_layout = prs.slide_layouts[1]  # Use the appropriate slide layout index according to your template
+slide = prs.slides.add_slide(slide_layout)
+
+# Define chart data
+categories = df['Category'].tolist()
+values = df['Value'].tolist()
+
+# Create a chart on the slide
+left = Inches(1)  # Adjust the position as needed
+top = Inches(1)
+width = Inches(6)  # Adjust the width as needed
+height = Inches(4)  # Adjust the height as needed
+chart = slide.shapes.add_chart(
+    XL_CHART_TYPE.BAR_CLUSTERED, left, top, width, height
+).chart
+
+# Add data to the chart
+chart.has_legend = False  # You can set this to True if you want to display legends
+chart_data = pd.Series(values, index=categories)
+chart_data_plt = chart.plots[0]
+chart_data_plt.replace_data(chart_data)
+
+# Customize the appearance of the chart
+category_axis = chart.category_axis
+category_axis.has_major_gridlines = True
+category_axis.tick_labels.font.size = Pt(10)  # Set the font size of category labels
+category_axis.tick_labels.number_format = '0'  # Set the number format of category labels
+
+value_axis = chart.value_axis
+value_axis.has_major_gridlines = True
+
+# Save the modified presentation
+prs.save('path/to/modified_presentation.pptx')
