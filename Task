@@ -415,3 +415,52 @@ pic = slide.shapes.add_picture(image_stream, left, top, height=Inches(3))  # Set
 # Save the modified presentation
 presentation.save('path_to_output_pptx_file.pptx')
 
+
+
+
+
+
+
+
+import pandas as pd
+from pptx import Presentation
+from pptx.util import Inches
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE
+
+# Load your data into a pandas DataFrame (replace this with your actual data source)
+data = {
+    'Category': ['A', 'B', 'C', 'D'],
+    'Values': [10, 15, 8, 12]
+}
+df = pd.DataFrame(data)
+
+# Load your existing PowerPoint presentation
+presentation = Presentation("existing_presentation.pptx")
+
+# Create a slide for the bar graph
+slide_layout = presentation.slide_layouts[1]  # Choose the slide layout you want (1 corresponds to Title and Content layout)
+slide = presentation.slides.add_slide(slide_layout)
+
+# Set slide title
+title = slide.shapes.title
+title.text = "Bar Graph from DataFrame"
+
+# Create a bar chart from the DataFrame
+chart_data = CategoryChartData()
+chart_data.categories = df['Category']
+chart_data.add_series('Values', df['Values'])
+
+x, y, cx, cy = Inches(2), Inches(2.5), Inches(6), Inches(3.5)
+chart = slide.shapes.add_chart(
+    XL_CHART_TYPE.BAR_CLUSTERED, x, y, cx, cy, chart_data
+).chart
+
+# Customize the chart (if needed)
+# For example, you can set the chart title:
+chart.has_title = True
+chart.chart_title.text_frame.text = "Bar Chart Title"
+
+# Save the modified presentation
+presentation.save("modified_presentation.pptx")
+
