@@ -232,3 +232,38 @@ for row_index, row in enumerate(data):
 
 # Save the modified presentation
 prs.save("modified_presentation.pptx")
+
+
+
+
+
+
+
+
+
+import streamlit as st
+
+# Use st.write() to print something to the app
+st.write("Hello, Streamlit!")
+
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Display text
+st.text("This is some text.")
+
+# Display a data frame
+data = {'Column 1': [1, 2, 3, 4],
+        'Column 2': [10, 20, 15, 25]}
+df = pd.DataFrame(data)
+st.dataframe(df)
+
+# Display a matplotlib plot
+plt.plot(data['Column 1'], data['Column 2'])
+st.pyplot(plt)
+
+# Display a button
+if st.button('Click me!'):
+    st.write('Button clicked!')
+
