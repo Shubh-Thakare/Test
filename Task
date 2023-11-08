@@ -368,3 +368,50 @@ chart = slide.shapes.add_chart(
 # Save the modified presentation
 presentation.save('modified_presentation.pptx')
 
+
+
+
+
+
+
+
+
+
+import pandas as pd
+from pptx import Presentation
+from pptx.util import Inches
+from io import BytesIO
+import matplotlib.pyplot as plt
+
+# Assuming you have a DataFrame named 'df' with data for the bar graph
+# df = pd.DataFrame({'Category': ['A', 'B', 'C'], 'Value': [10, 20, 15]})
+
+# Create a bar graph using pandas
+ax = df.plot(kind='bar', x='Category', y='Value', legend=False)
+plt.ylabel('Value')  # Set y-axis label
+plt.xlabel('Category')  # Set x-axis label
+plt.title('Bar Graph')  # Set title
+plt.tight_layout()
+
+# Save the plot to a BytesIO object
+image_stream = BytesIO()
+plt.savefig(image_stream, format='png')
+image_stream.seek(0)
+plt.close()
+
+# Load the existing PowerPoint presentation
+pptx_file = 'path_to_existing_pptx_file.pptx'
+presentation = Presentation(pptx_file)
+
+# Add a new slide to the presentation
+slide_layout = presentation.slide_layouts[1]  # You can choose a different slide layout if needed
+slide = presentation.slides.add_slide(slide_layout)
+
+# Add the bar graph image to the slide
+left = Inches(1)  # Adjust the left position of the image on the slide
+top = Inches(1)   # Adjust the top position of the image on the slide
+pic = slide.shapes.add_picture(image_stream, left, top, height=Inches(3))  # Set image height as needed
+
+# Save the modified presentation
+presentation.save('path_to_output_pptx_file.pptx')
+
