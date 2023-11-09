@@ -464,3 +464,46 @@ chart.chart_title.text_frame.text = "Bar Chart Title"
 # Save the modified presentation
 presentation.save("modified_presentation.pptx")
 
+
+
+
+
+
+
+
+
+
+
+# Sample predictions and actual labels (binary classification)
+predictions = [0.2, 0.6, 0.8, 0.3, 0.7]
+actual_labels = [0, 1, 1, 0, 1]
+
+# Step 2: Generate Thresholds
+thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+# Step 3: Calculate TPR and FPR for Each Threshold
+tpr_list = []
+fpr_list = []
+
+for threshold in thresholds:
+    tp = sum((p >= threshold) and (a == 1) for p, a in zip(predictions, actual_labels))
+    fn = sum((p < threshold) and (a == 1) for p, a in zip(predictions, actual_labels))
+    fp = sum((p >= threshold) and (a == 0) for p, a in zip(predictions, actual_labels))
+    tn = sum((p < threshold) and (a == 0) for p, a in zip(predictions, actual_labels))
+    
+    tpr = tp / (tp + fn)
+    fpr = fp / (fp + tn)
+    
+    tpr_list.append(tpr)
+    fpr_list.append(fpr)
+
+# Step 4: Plot the ROC Curve
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(6, 6))
+plt.plot(fpr_list, tpr_list, marker='o', linestyle='--', color='b')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.grid(True)
+plt.show()
