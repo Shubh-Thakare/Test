@@ -1,0 +1,32 @@
+data your_dataset; /* replace "your_dataset" with the actual name of your dataset */
+  set your_dataset; /* replace "your_dataset" with the actual name of your dataset */
+  
+  by contract_number; /* assuming you have a variable named contract_number */
+
+  /* Initialize the sum and count for each contract */
+  retain sum_balance 0;
+  retain count 0;
+
+  /* Check if a new contract is encountered, reset the sum and count */
+  if first.contract_number then do;
+    sum_balance = 0;
+    count = 0;
+  end;
+
+  /* Update the sum and count for each observation */
+  sum_balance + balance_variable; /* replace "balance_variable" with the actual name of your balance variable */
+  count + 1;
+
+  /* Check if we have accumulated 3 months of data */
+  if count = 3 then do;
+    /* Calculate the 3-month moving average */
+    moving_average = sum_balance / count;
+    
+    /* Output the result */
+    output;
+
+    /* Reset the sum and count for the next 3-month period */
+    sum_balance = 0;
+    count = 0;
+  end;
+run;
