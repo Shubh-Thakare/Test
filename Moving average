@@ -86,3 +86,63 @@ run;
 /* Print the result */
 proc print data=moving_avg_dataset;
 run;
+
+
+
+
+
+
+data have;
+input member_id date :date9. amount;
+format date date9.;
+datalines;
+1 01JAN2021 100
+1 01FEB2021 0
+1 01MAR2021 0
+1 01APR2021 0
+1 01MAY2021 50
+1 01JUN2021 0
+1 01JUL2021 0
+1 01AUG2021 0
+1 01SEP2021 0
+1 01OCT2021 0
+1 01NOV2021 0
+1 01DEC2021 0
+1 01JAN2022 150
+2 01JAN2021 0
+2 01FEB2021 0
+2 01MAR2021 0
+2 01APR2021 0
+2 01MAY2021 0
+2 01JUN2021 0
+2 01JUL2021 0
+2 01AUG2021 0
+2 01SEP2021 0
+2 01OCT2021 0
+2 01NOV2021 0
+2 01DEC2021 0
+2 01JAN2022 0
+;
+run;
+
+data want;
+set have;
+by member_id;
+retain zero_flag 0;
+if first.member_id then zero_flag = 0;
+
+if amount = 0 then do;
+    zero_flag + 1;
+    if zero_flag = 1 then flag = 1;
+    else flag = 0;
+end;
+else do;
+    zero_flag = 0;
+    flag = 0;
+end;
+
+drop zero_flag;
+run;
+
+proc print data=want;
+run;
