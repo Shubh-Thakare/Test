@@ -268,3 +268,65 @@ data flag_data;
 
     drop zero_flag;
 run;
+
+
+
+
+
+
+
+
+
+data have;
+input id date :date9. amount;
+format date date9.;
+datalines;
+1 01JAN2021 100
+1 01FEB2021 0
+1 01MAR2021 0
+1 01APR2021 0
+1 01MAY2021 50
+1 01JUN2021 0
+1 01JUL2021 0
+1 01AUG2021 0
+1 01SEP2021 0
+1 01OCT2021 0
+1 01NOV2021 0
+1 01DEC2021 0
+1 01JAN2022 0
+2 01JAN2021 0
+2 01FEB2021 50
+2 01MAR2021 67
+2 01APR2021 87
+2 01MAY2021 0
+2 01JUN2021 89
+2 01JUL2021 0
+3 01JAN2021 0
+3 01FEB2021 0
+3 01MAR2021 0
+3 01APR2021 0
+3 01MAY2021 0
+3 01JUN2022 0
+;
+run;
+
+data want;
+set have;
+by id;
+retain zero_flag;
+if first.id then zero_flag = 0;  /* Reset flag for each new member */
+
+/* Check if amount is zero and the previous amount was also zero */
+if amount = 0 and lag(amount) = 0 then zero_flag = 1;
+
+/* Output the flag when it changes or for the first record of each member */
+if first.id or zero_flag = 1 then output;
+
+/* Keep the flag for next iteration */
+if amount ne 0 then zero_flag = 0;
+run;
+
+proc print data=want;
+format date date9.;
+run;
+
