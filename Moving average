@@ -146,3 +146,57 @@ run;
 
 proc print data=want;
 run;
+
+
+
+
+
+
+
+data have;
+input member_id date :date9. amount;
+format date date9.;
+datalines;
+1 01JAN2021 100
+1 01FEB2021 0
+1 01MAR2021 0
+1 01APR2021 0
+1 01MAY2021 50
+1 01JUN2021 0
+1 01JUL2021 0
+1 01AUG2021 0
+1 01SEP2021 0
+1 01OCT2021 0
+1 01NOV2021 0
+1 01DEC2021 0
+1 01JAN2022  0
+2 01JAN2021 0
+2 01FEB2021 50
+2 01MAR2021 67
+2 01APR2021 87
+2 01MAY2021 0
+2 01JUN2021 89
+2 01JUL2021 0
+3 01JAN2021 0
+3 01FEB2021 0
+3 01MAR2021 0
+3 01APR2021 0
+3 01MAY2021 0
+3 01JUN2022 0
+;
+run;
+
+data want;
+set have;
+by member_id;
+retain flag 0;
+if first.member_id then flag = 0; /* reset flag at the start of each member_id */
+if amount = 0 then flag + 1; /* increment flag if amount is zero */
+else flag = 0; /* reset flag if amount is not zero */
+if flag = 3 then flag_date = date; /* mark the date if flag reaches 3 */
+format flag_date date9.;
+run;
+
+proc print data=want;
+run;
+
