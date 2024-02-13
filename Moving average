@@ -330,3 +330,24 @@ proc print data=want;
 format date date9.;
 run;
 
+
+
+
+
+
+
+data want;
+  set have;
+  by member_id;
+  retain flag 0;
+  
+  if first.member_id then flag = 0; /* Reset flag for each member_id */
+  
+  if amount = 0 then flag = 1; /* Set flag to 1 if amount is zero */
+  else flag = 0; /* Reset flag to 0 if amount is not zero */
+  
+  output;
+run;
+
+proc print data=want;
+run;
