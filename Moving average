@@ -351,3 +351,28 @@ run;
 
 proc print data=want;
 run;
+
+
+
+
+
+
+data want;
+    set have;
+    by id;
+    
+    retain prev_amount;
+    
+    if first.id then do;
+        prev_amount = amount;
+    end;
+    
+    if amount = 0 and prev_amount ne 0 then do;
+        flag = 1;
+    end;
+    else flag = 0;
+    
+    prev_amount = amount;
+    
+    drop prev_amount;
+run;
