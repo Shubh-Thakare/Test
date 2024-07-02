@@ -1,0 +1,167 @@
+import difflib
+
+def compare_strings_difflib(str1, str2):
+    return difflib.SequenceMatcher(None, str1, str2).ratio()
+
+str1 = "Hello, world!"
+str2 = "Hello, Python world!"
+score = compare_strings_difflib(str1, str2)
+print(f"Difflib similarity score: {score}")
+
+
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+def compare_strings_cosine(str1, str2):
+    tfidf = TfidfVectorizer().fit_transform([str1, str2])
+    return cosine_similarity(tfidf[0:1], tfidf[1:2])[0][0]
+
+str1 = "Hello, world!"
+str2 = "Hello, Python world!"
+score = compare_strings_cosine(str1, str2)
+print(f"Cosine similarity score: {score}")
+
+
+
+
+from transformers import BertTokenizer, BertModel
+import torch
+import numpy as np
+
+def compare_strings_bert(str1, str2):
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    model = BertModel.from_pretrained('bert-base-uncased')
+
+    inputs1 = tokenizer(str1, return_tensors='pt', truncation=True, padding=True, max_length=512)
+    inputs2 = tokenizer(str2, return_tensors='pt', truncation=True, padding=True, max_length=512)
+
+    with torch.no_grad():
+        outputs1 = model(**inputs1)
+        outputs2 = model(**inputs2)
+
+    embedding1 = outputs1.last_hidden_state.mean(dim=1)
+    embedding2 = outputs2.last_hidden_state.mean(dim=1)
+
+    cosine_similarity = torch.nn.functional.cosine_similarity(embedding1, embedding2).item()
+    return cosine_similarity
+
+str1 = "Hello, world!"
+str2 = "Hello, Python world!"
+score = compare_strings_bert(str1, str2)
+print(f"BERT similarity score: {score}")
+
+
+
+
+from sentence_transformers import SentenceTransformer, util
+
+def bert_similarity(s1, s2):
+    model = SentenceTransformer('bert-base-nli-mean-tokens')
+    embeddings = model.encode([s1, s2])
+    return util.pytorch_cos_sim(embeddings[0], embeddings[1]).item()
+
+s1 = "example string one"
+s2 = "example string two"
+score = bert_similarity(s1, s2)
+print(f"BERT Similarity: {score}")
+
+
+
+
+
+
+from transformers import BertTokenizer, BertModel
+import torch
+
+# Load pre-trained model tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+# Encode text
+def encode_text(text):
+    input_ids = tokenizer.encode(text, add_special_tokens=True)
+    return torch.tensor([input_ids])
+
+# Load pre-trained model
+model = BertModel.from_pretrained('bert-base-uncased')
+
+# Function to get embeddings from BERT
+def get_embeddings(text):
+    with torch.no_grad():
+        input_ids = encode_text(text)
+        outputs = model(input_ids)
+        hidden_states = outputs.last_hidden_state
+        embeddings = torch.mean(hidden_states, dim=1).squeeze()
+    return embeddings
+
+# Compare two strings using BERT
+def compare_strings_bert(str1, str2):
+    embeddings1 = get_embeddings(str1)
+    embeddings2 = get_embeddings(str2)
+    cosine_sim = torch.nn.functional.cosine_similarity(embeddings1, embeddings2, dim=0)
+    return cosine_sim.item()
+
+str1 = "Hello, world!"
+str2 = "Hello, everyone!"
+score = compare_strings_bert(str1, str2)
+print(f"Similarity score using BERT: {score}")
+
+
+
+
+
+
+pip install nltk
+from nltk.util import ngrams
+from nltk.tokenize import word_tokenize
+
+def jaccard_similarity(str1, str2, n=2):
+    # Tokenize the strings
+    tokens1 = set(ngrams(word_tokenize(str1), n))
+    tokens2 = set(ngrams(word_tokenize(str2), n))
+    
+    # Calculate Jaccard similarity
+    intersection = tokens1.intersection(tokens2)
+    union = tokens1.union(tokens2)
+    similarity = len(intersection) / len(union)
+    return similarity
+
+# Example usage
+str1 = "I love machine learning"
+str2 = "I love learning machines"
+score = jaccard_similarity(str1, str2)
+print(f"Jaccard similarity score: {score}")
+
+
+
+
+
+pip install transformers torch scipy
+import torch
+from transformers import BertTokenizer, BertModel
+from scipy.spatial.distance import cosine
+
+# Load pre-trained model and tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertModel.from_pretrained('bert-base-uncased')
+
+def get_embeddings(text):
+    inputs = tokenizer(text, return_tensors='pt')
+    outputs = model(**inputs)
+    return outputs.last_hidden_state.mean(dim=1).detach().numpy()
+
+def cosine_similarity(embedding1, embedding2):
+    return 1 - cosine(embedding1, embedding2)
+
+# Example strings
+string1 = "The quick brown fox jumps over the lazy dog."
+string2 = "A swift auburn fox leaps over a sleepy dog."
+
+# Get embeddings
+embedding1 = get_embeddings(string1)
+embedding2 = get_embeddings(string2)
+
+# Compute similarity score
+score = cosine_similarity(embedding1, embedding2)
+
+print(f'Similarity score: {score}')
