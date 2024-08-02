@@ -507,3 +507,59 @@ plt.ylabel('True Positive Rate')
 plt.title('ROC Curve')
 plt.grid(True)
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LassoCV
+from sklearn.feature_selection import SelectKBest, f_regression, RFE
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.decomposition import PCA
+
+# Load dataset
+data = pd.read_csv('your_dataset.csv')
+X = data.drop('target', axis=1)
+y = data['target']
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Filter method: SelectKBest with f_regression
+filter_selector = SelectKBest(score_func=f_regression, k=10)
+X_train_filtered = filter_selector.fit_transform(X_train, y_train)
+X_test_filtered = filter_selector.transform(X_test)
+
+# Wrapper method: RFE with RandomForest
+rfe_selector = RFE(estimator=RandomForestRegressor(), n_features_to_select=10, step=1)
+X_train_rfe = rfe_selector.fit_transform(X_train, y_train)
+X_test_rfe = rfe_selector.transform(X_test)
+
+# Embedded method: Lasso
+lasso = LassoCV()
+lasso.fit(X_train, y_train)
+importance = pd.Series(lasso.coef_, index=X_train.columns).abs().sort_values(ascending=False)
+selected_features = importance[importance > 0].index
+X_train_lasso = X_train[selected_features]
+X_test_lasso = X_test[selected_features]
+
+# Dimensionality Reduction: PCA
+pca = PCA(n_components=10)
+X_train_pca = pca.fit_transform(X_train)
+X_test_pca = pca.transform(X_test)
+
+# Tree-Based: Feature Importance with RandomForest
+rf = RandomForestRegressor()
+rf.fit(X_train, y_train)
+importance = pd.Series(rf.feature_importances_, index=X_train.columns).sort_values(ascending=False)
+selected_features = importance.head(10).index
+X_train_rf = X_train[selected_features]
+X_test_rf = X_test[selected_features]
