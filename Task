@@ -563,3 +563,35 @@ importance = pd.Series(rf.feature_importances_, index=X_train.columns).sort_valu
 selected_features = importance.head(10).index
 X_train_rf = X_train[selected_features]
 X_test_rf = X_test[selected_features]
+
+
+
+import pandas as pd
+
+# Example DataFrame
+data = {
+    'contract_id': [1, 1, 1, 2, 2, 2],
+    'date': ['2023-08-28', '2022-08-28', '2023-08-29', '2023-08-28', '2022-08-28', '2023-08-29'],
+    'salary': [5000, 4500, 5200, 6000, 5800, 6200]
+}
+
+df = pd.DataFrame(data)
+
+# Convert 'date' column to datetime
+df['date'] = pd.to_datetime(df['date'])
+
+df['year'] = df['date'].dt.year
+
+# Pivot the data to have separate columns for current year and last year's salary
+pivot_df = df.pivot_table(index=['contract_id', 'date'], columns='year', values='salary').reset_index()
+
+# Rename columns for clarity
+pivot_df.columns.name = None
+pivot_df.rename(columns={2023: 'current_salary', 2022: 'last_year_salary'}, inplace=True)
+
+
+pivot_df['salary_difference'] = pivot_df['current_salary'] - pivot_df['last_year_salary']
+
+
+
+
