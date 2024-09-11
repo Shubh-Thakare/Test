@@ -1,3 +1,14 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Sample Data (Replace this with your actual dataset)
+data = {'Date': pd.date_range(start='2021-01-01', periods=12, freq='M'),
+        'Category': ['Electronics', 'Furniture', 'Clothing'] * 4,
+        'Sales': [200, 150, 300, 220, 180, 350, 250, 200, 400, 270, 190, 410]}
+
+df = pd.DataFrame(data)
+
 import ipywidgets as widgets
 from IPython.display import display
 
