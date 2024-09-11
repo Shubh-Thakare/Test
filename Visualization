@@ -49,3 +49,72 @@ def update_plot(categories, date_range):
 
 # Link the widget to the plotting function
 widgets.interact(update_plot, categories=category_dropdown, date_range=date_range_slider)
+
+
+
+
+
+
+
+# Example DataFrame
+data = {'Date': pd.date_range(start='2021-01-01', periods=100, freq='D'),
+        'Category': ['A', 'B', 'C'] * 33 + ['A'],
+        'Value': [i + (i % 3)*5 for i in range(100)]}
+
+df = pd.DataFrame(data)
+
+# Filter for Category selection
+category_filter = widgets.SelectMultiple(
+    options=df['Category'].unique(),
+    value=['A', 'B', 'C'],
+    description='Category:',
+    disabled=False
+)
+
+# Filter for Date Range selection
+date_filter = widgets.SelectionRangeSlider(
+    options=pd.to_datetime(df['Date'].unique()),
+    index=(0, len(df['Date'].unique())-1),
+    description='Date Range',
+    disabled=False
+)
+
+# Checkbox for All Data option
+all_data_checkbox = widgets.Checkbox(
+    value=False,
+    description='Select All Data',
+    disabled=False
+)
+
+def update_plot(category, date_range, select_all_data):
+    if select_all_data:
+        filtered_df = df.copy()  # Use all data
+    else:
+        # Apply filters
+        filtered_df = df[(df['Category'].isin(category)) & 
+                         (df['Date'] >= date_range[0]) & 
+                         (df['Date'] <= date_range[1])]
+
+    # Create line plot using Plotly
+    fig = px.line(filtered_df, x='Date', y='Value', color='Category', 
+                  title='Interactive Line Plot with Filters')
+    fig.show()
+
+# Define function that will react to widget changes
+def on_value_change(change):
+    update_plot(category_filter.value, date_filter.value, all_data_checkbox.value)
+
+# Observe widget value changes
+category_filter.observe(on_value_change, names='value')
+date_filter.observe(on_value_change, names='value')
+all_data_checkbox.observe(on_value_change, names='value')
+
+# Display the widgets
+display(category_filter, date_filter, all_data_checkbox)
+
+# Display the initial plot (without filtering)
+update_plot(category_filter.value, date_filter.value, all_data_checkbox.value)
+
+
+
+
