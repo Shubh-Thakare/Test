@@ -1,0 +1,40 @@
+import ipywidgets as widgets
+from IPython.display import display
+
+# Dropdown for category selection
+category_dropdown = widgets.SelectMultiple(
+    options=df['Category'].unique(),
+    value=[df['Category'].unique()[0]],
+    description='Category',
+    disabled=False
+)
+
+# Date Range Slider
+date_range_slider = widgets.SelectionRangeSlider(
+    options=pd.date_range(start='2021-01-01', end='2021-12-31', freq='M'),
+    index=(0, 11),
+    description='Date Range',
+    orientation='horizontal'
+)
+
+def update_plot(categories, date_range):
+    # Apply filters
+    filtered_df = df[(df['Category'].isin(categories)) & 
+                     (df['Date'] >= date_range[0]) & 
+                     (df['Date'] <= date_range[1])]
+    
+    # Pivot the filtered data
+    pivot_filtered_df = pd.pivot_table(filtered_df, values='Sales', index='Date', columns='Category', aggfunc='sum')
+    
+    # Plot the data
+    plt.figure(figsize=(10, 6))
+    sns.lineplot(data=pivot_filtered_df)
+    plt.title('Sales by Category Over Time')
+    plt.ylabel('Total Sales')
+    plt.xlabel('Date')
+    plt.xticks(rotation=45)
+    plt.legend(title='Category', loc='upper left')
+    plt.show()
+
+# Link the widget to the plotting function
+widgets.interact(update_plot, categories=category_dropdown, date_range=date_range_slider)
