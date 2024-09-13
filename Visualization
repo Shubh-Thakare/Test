@@ -118,3 +118,29 @@ update_plot(category_filter.value, date_filter.value, all_data_checkbox.value)
 
 
 
+import pandas as pd
+
+# Sample DataFrame
+df = pd.DataFrame({
+    ('A', 'foo'): [1, 2, 3],
+    ('A', 'bar'): [4, 5, 6],
+    ('B', 'baz'): [7, 8, 9],
+    ('B', 'qux'): [10, 11, 12]
+}, index=['x', 'y', 'z'])
+
+print("Original DataFrame:")
+print(df)
+
+# Update the second level column names
+new_second_level = ['alpha', 'beta', 'gamma', 'delta']
+
+# Apply the new second level names
+df.columns = pd.MultiIndex.from_tuples(
+    [(col[0], new_second_level[i]) for i, col in enumerate(df.columns)]
+)
+
+print("\nDataFrame with Updated Second Level Column Names:")
+print(df)
+
+
+
