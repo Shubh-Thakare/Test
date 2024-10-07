@@ -211,3 +211,16 @@ accuracy = accuracy_score(y_test, y_pred)
 print("Selected Features:", selected_features)
 print("Accuracy:", accuracy)
 
+
+
+
+# Import additional module
+from statsmodels.stats.anova import anova_lm
+
+# Fit an OLS model for Type III sum of squares
+ols_model = sm.OLS(y, X).fit()
+
+# Get Type III sum of squares
+anova_results = anova_lm(ols_model, typ=3)
+print("Type III Sum of Squares:\n", anova_results)
+
