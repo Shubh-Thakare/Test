@@ -1,0 +1,29 @@
+Sub PredictValue()
+    Dim wsDashboard As Worksheet
+    Dim wsModel As Worksheet
+    Dim featureRange As Range
+    Dim coefficientRange As Range
+    Dim intercept As Double
+    Dim prediction As Double
+    Dim i As Integer
+
+    ' Set references to the sheets
+    Set wsDashboard = ThisWorkbook.Sheets("Dashboard")
+    Set wsModel = ThisWorkbook.Sheets("Model")
+
+    ' Define the feature and coefficient ranges
+    Set featureRange = wsDashboard.Range("B2:B5") ' User input feature values
+    Set coefficientRange = wsModel.Range("B2:B5") ' Corresponding coefficients
+    intercept = wsModel.Range("B1").Value         ' Intercept value
+
+    ' Initialize prediction with the intercept
+    prediction = intercept
+
+    ' Calculate the prediction
+    For i = 1 To featureRange.Rows.Count
+        prediction = prediction + featureRange.Cells(i, 1).Value * coefficientRange.Cells(i, 1).Value
+    Next i
+
+    ' Output the prediction result
+    wsDashboard.Range("B6").Value = prediction
+End Sub
