@@ -27,3 +27,66 @@ Sub PredictValue()
     ' Output the prediction result
     wsDashboard.Range("B6").Value = prediction
 End Sub
+
+
+
+
+
+Private Sub UserForm_Initialize()
+    ' Initialize ComboBox1 with values for Feature1
+    ComboBox1.AddItem "Option1"
+    ComboBox1.AddItem "Option2"
+    ComboBox1.AddItem "Option3"
+    
+    ' Initialize ComboBox2 with values for Feature2
+    ComboBox2.AddItem "TypeA"
+    ComboBox2.AddItem "TypeB"
+    ComboBox2.AddItem "TypeC"
+End Sub
+
+Private Sub CommandButton1_Click()
+    ' Read Coefficients from the Sheet
+    Dim intercept As Double
+    Dim coeff1 As Double, coeff2 As Double, coeff3 As Double, coeff4 As Double, coeff5 As Double
+    Dim feature1Val As Double, feature2Val As Double
+    Dim feature3Val As Double, feature4Val As Double, feature5Val As Double
+    Dim prediction As Double
+    
+    ' Retrieve coefficients from sheet (assuming they are in Sheet1, starting at A2)
+    intercept = Sheets("Sheet1").Range("B2").Value
+    coeff1 = Sheets("Sheet1").Range("B3").Value
+    coeff2 = Sheets("Sheet1").Range("B4").Value
+    coeff3 = Sheets("Sheet1").Range("B5").Value
+    coeff4 = Sheets("Sheet1").Range("B6").Value
+    coeff5 = Sheets("Sheet1").Range("B7").Value
+    
+    ' Map Feature1 and Feature2 values to numerical equivalents
+    Select Case ComboBox1.Value
+        Case "Option1": feature1Val = 1
+        Case "Option2": feature1Val = 2
+        Case "Option3": feature1Val = 3
+    End Select
+    
+    Select Case ComboBox2.Value
+        Case "TypeA": feature2Val = 1
+        Case "TypeB": feature2Val = 2
+        Case "TypeC": feature2Val = 3
+    End Select
+    
+    ' Read Feature3, Feature4, Feature5 values from textboxes
+    feature3Val = CDbl(TextBox1.Value)
+    feature4Val = CDbl(TextBox2.Value)
+    feature5Val = CDbl(TextBox3.Value)
+    
+    ' Calculate Prediction
+    prediction = intercept + _
+                 coeff1 * feature1Val + _
+                 coeff2 * feature2Val + _
+                 coeff3 * feature3Val + _
+                 coeff4 * feature4Val + _
+                 coeff5 * feature5Val
+    
+    ' Display Prediction
+    MsgBox "Predicted Value: " & prediction, vbInformation, "Prediction Result"
+End Sub
+
