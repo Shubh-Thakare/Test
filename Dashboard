@@ -90,3 +90,11 @@ Private Sub CommandButton1_Click()
     MsgBox "Predicted Value: " & prediction, vbInformation, "Prediction Result"
 End Sub
 
+
+
+
+
+Set objExcel = CreateObject("Excel.Application")
+objExcel.Visible = False
+Set objWorkbook = objExcel.Workbooks.Open("C:\Path\To\Your\File.xlsm")
+objExcel.Run "frmPrediction.Show"
