@@ -98,3 +98,13 @@ Set objExcel = CreateObject("Excel.Application")
 objExcel.Visible = False
 Set objWorkbook = objExcel.Workbooks.Open("C:\Path\To\Your\File.xlsm")
 objExcel.Run "frmPrediction.Show"
+
+
+
+
+
+SageMaker Clarify requires several key inputs to function effectively."
+"First, it needs the training data —the dataset used to build the model—and the model itself , so it can assess how the model behaves."
+"It also requires information about sensitive features , such as age or gender, which are critical for evaluating fairness."
+"Finally, we specify the fairness metrics we want to measure, such as disparate impact or demographic parity."
+
