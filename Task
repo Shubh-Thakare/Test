@@ -687,3 +687,42 @@ TRGT_PRTCP = df_query.toPandas()
 # Step 4: Reset index (optional, if needed)
 TRGT_PRTCP.reset_index(drop=True, inplace=True)
 
+
+
+
+
+import pandas as pd
+
+# Convert PRTCP_TRGT DataFrame to a list of tuples
+prtcp_trgt_values = ", ".join([f"('{row[0]}', '{row[1]}')" for row in PRTCP_TRGT[['PRTCP_ID', 'DUE_DT']].to_records(index=False)])
+
+# Construct the SQL query with dynamically inserted values
+query = f"""
+WITH PRTCP_TRGT_DATA AS (
+    SELECT 
+        PRTCP_ID,
+        DUE_DT
+    FROM VALUES
+    {prtcp_trgt_values}
+)
+SELECT DISTINCT
+    A.PRFX_CD,
+    A.CNTR_NMBR,
+    A.ENTRPS_ID,
+    A.PRTCP_ID,
+    A.EFCTV_DT
+FROM MBR A
+JOIN PRTCP_TRGT_DATA B
+    ON A.PRTCP_ID = B.PRTCP_ID
+WHERE A.ACTV_MBR_CD = 1
+AND A.EFCTV_DT = (
+    SELECT MAX(A1.EFCTV_DT)
+    FROM MBR A1
+    WHERE A1.PRTCP_ID = A.PRTCP_ID
+    AND A1.EFCTV_DT < B.DUE_DT
+);
+"""
+
+# Execute the query and fetch results
+df_query = session.sql(query)
+TRGT_PRTCP = df_query.toPandas()
