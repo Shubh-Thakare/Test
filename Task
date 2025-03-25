@@ -595,3 +595,52 @@ pivot_df['salary_difference'] = pivot_df['current_salary'] - pivot_df['last_year
 
 
 
+
+
+
+
+/* Step 1: Define the participant data */
+data participant_data;
+    input participant_id $ participant_date :yymmdd10.;
+    format participant_date yymmdd10.;
+    datalines;
+12345 2023-10-01
+67890 2023-09-15
+... /* Add all 4000 participants here */
+;
+run;
+
+/* Step 2: Connect to the DB2 table and fetch the required data */
+proc sql;
+    connect to db2 (database=your_db2_database user=your_username password=your_password);
+
+    create table filtered_data as
+    select * from connection to db2 (
+        /* Subquery to find the max effective_date for each participant */
+        select t1.participant_id,
+               t1.effective_date,
+               t1.other_columns /* Include other columns you need */
+        from your_db2_table t1
+        inner join (
+            /* Filter participant IDs and dates */
+            select participant_id, max(effective_date) as max_effective_date
+            from your_db2_table
+            where participant_id in (
+                /* List of participant IDs */
+                select participant_id from participant_data
+            )
+            and effective_date < (
+                /* Corresponding participant_date */
+                select participant_date
+                from participant_data p
+                where p.participant_id = your_db2_table.participant_id
+            )
+            group by participant_id
+        ) t2
+        on t1.participant_id = t2.participant_id
+        and t1.effective_date = t2.max_effective_date
+    );
+
+    disconnect from db2;
+quit;
+
