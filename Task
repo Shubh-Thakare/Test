@@ -1,3 +1,39 @@
+# Step 1: Prepare the list of PRTCP_IDs and DUE_DTs from PRTCP_TRGT
+prtcp_ids = "','".join(PRTCP_TRGT['PRTCP_ID'].astype(str))
+due_dts = "','".join(PRTCP_TRGT['DUE_DT'].astype(str))
+
+# Step 2: Construct a single SQL query to fetch all required data
+query = f"""
+WITH Filtered_MBR AS (
+    SELECT
+        A.PRFX_CD,
+        A.CNTR_NMBR,
+        A.ENTRPS_ID,
+        A.PRTCP_ID,
+        A.EFCTV_DT,
+        ROW_NUMBER() OVER (PARTITION BY A.PRTCP_ID ORDER BY A.EFCTV_DT DESC) AS rn
+    FROM MBR A
+    WHERE A.ACTV_MBR_CD = 1
+      AND A.PRTCP_ID IN ('{prtcp_ids}')
+      AND A.EFCTV_DT < (
+          SELECT MAX(A1.EFCTV_DT)
+          FROM MBR A1
+          WHERE A1.PRTCP_ID = A.PRTCP_ID
+            AND A1.EFCTV_DT < TO_DATE('{due_dts}', 'YYYY-MM-DD')
+      )
+)
+SELECT PRFX_CD, CNTR_NMBR, ENTRPS_ID, PRTCP_ID, EFCTV_DT
+FROM Filtered_MBR
+WHERE rn = 1;
+"""
+
+# Step 3: Execute the query and load the result into a DataFrame
+df_query = session.sql(query)
+TRGT_PRTCP = df_query.toPandas()
+
+
+
+
 # Step 1: Extract PRTCP_ID and DUE_DT from PRTCP_TRGT as a list of tuples
 participant_data = list(zip(PRTCP_TRGT['PRTCP_ID'], PRTCP_TRGT['DUE_DT']))
 
