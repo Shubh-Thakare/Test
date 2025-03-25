@@ -644,3 +644,46 @@ proc sql;
     disconnect from db2;
 quit;
 
+
+
+
+
+# Step 1: Upload PRTCP_TRGT to the database as a temporary table
+session.create_dataframe(PRTCP_TRGT).create_or_replace_temp_view("PRTCP_TRGT_TEMP")
+
+# Step 2: Write an optimized SQL query
+query = """
+WITH RankedData AS (
+    SELECT
+        A.PRFX_CD,
+        A.CNTR_NMBR,
+        A.ENTRPS_ID,
+        A.PRTCP_ID,
+        A.EFCTV_DT,
+        ROW_NUMBER() OVER (
+            PARTITION BY A.PRTCP_ID 
+            ORDER BY A.EFCTV_DT DESC
+        ) AS rn
+    FROM MBR A
+    INNER JOIN PRTCP_TRGT_TEMP B
+        ON A.PRTCP_ID = B.PRTCP_ID
+    WHERE A.ACTV_MBR_CD = 1
+      AND A.EFCTV_DT < B.DUE_DT
+)
+SELECT
+    PRFX_CD,
+    CNTR_NMBR,
+    ENTRPS_ID,
+    PRTCP_ID,
+    EFCTV_DT
+FROM RankedData
+WHERE rn = 1
+"""
+
+# Step 3: Execute the query and fetch results
+df_query = session.sql(query)
+TRGT_PRTCP = df_query.toPandas()
+
+# Step 4: Reset index (optional, if needed)
+TRGT_PRTCP.reset_index(drop=True, inplace=True)
+
