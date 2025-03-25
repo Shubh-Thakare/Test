@@ -1,3 +1,62 @@
+# Step 1: Extract PRTCP_ID and DUE_DT from PRTCP_TRGT as a list of tuples
+participant_data = list(zip(PRTCP_TRGT['PRTCP_ID'], PRTCP_TRGT['DUE_DT']))
+
+# Step 2: Construct a single SQL query to fetch all required data
+query = f'''
+WITH ParticipantData AS (
+    SELECT 
+        '{participant_data[0][0]}' AS PRTCP_ID,
+        TO_DATE('{participant_data[0][1]}') AS DUE_DT
+    UNION ALL
+'''
+
+for i, (prt_id, due_dt) in enumerate(participant_data[1:], start=1):
+    query += f'''
+    SELECT 
+        '{prt_id}' AS PRTCP_ID,
+        TO_DATE('{due_dt}') AS DUE_DT
+    '''
+    if i < len(participant_data) - 1:
+        query += "UNION ALL"
+
+query += f'''
+)
+SELECT DISTINCT
+    A.PRFX_CD,
+    A.CNTR_NMBR,
+    A.ENTRPS_ID,
+    A.PRTCP_ID,
+    A.EFCTV_DT
+FROM MBR A
+JOIN ParticipantData PD
+    ON A.PRTCP_ID = PD.PRTCP_ID
+WHERE A.ACTV_MBR_CD = 1
+AND A.EFCTV_DT = (
+    SELECT MAX(A1.EFCTV_DT)
+    FROM MBR A1
+    WHERE A1.PRTCP_ID = A.PRTCP_ID
+    AND A1.EFCTV_DT < PD.DUE_DT
+);
+'''
+
+# Step 3: Execute the query and load the result into a Pandas DataFrame
+df_query = session.sql(query)
+result = df_query.toPandas()
+
+# Step 4: Assign the result to TRGT_PRTCP
+TRGT_PRTCP = result
+
+
+
+
+
+
+
+
+
+
+
+
 hii/* Sort the DataFrame by ContractNumber and EffectiveDate */
 proc sort data=YourDataFrame;
   by ContractNumber EffectiveDate;
