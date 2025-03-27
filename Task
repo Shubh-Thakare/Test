@@ -1,3 +1,36 @@
+# Write a single SQL query to fetch the last 12 effective dates for each participant
+query = '''
+WITH Ranked_EFCTV_DT AS (
+    SELECT
+        A.PRFX_CD,
+        A.CNTR_NMBR,
+        A.ENTRPS_ID,
+        A.PRTCP_ID,
+        A.EFCTV_DT,
+        ROW_NUMBER() OVER (PARTITION BY A.PRTCP_ID ORDER BY A.EFCTV_DT DESC) AS RANK_ORDER
+    FROM MBR_MO A
+    WHERE A.ACTV_MBR_CD = 1
+      AND A.PRTCP_ID IS NOT NULL
+)
+SELECT
+    PRFX_CD,
+    CNTR_NMBR,
+    ENTRPS_ID,
+    PRTCP_ID,
+    EFCTV_DT
+FROM Ranked_EFCTV_DT
+WHERE RANK_ORDER <= 12
+'''
+
+# Execute the query and fetch the result
+df_query = session.sql(query)
+MBR_Df = df_query.toPandas()
+
+
+
+
+
+
 # Step 1: Prepare the list of PRTCP_IDs and DUE_DTs from PRTCP_TRGT
 prtcp_ids = "','".join(PRTCP_TRGT['PRTCP_ID'].astype(str))
 due_dts = "','".join(PRTCP_TRGT['DUE_DT'].astype(str))
