@@ -1,3 +1,19 @@
+
+def custom_13_month_avg(salary_series):
+    # First and last months are halved
+    return (salary_series.iloc[0]/2 + salary_series.iloc[12]/2 + salary_series.iloc[1:12].sum()) / 12
+
+# Apply rolling with window size 13 and custom function
+df['custom_avg'] = df['salary'].rolling(window=13).apply(custom_13_month_avg, raw=False)
+
+
+
+
+
+
+
+
+
 # Write a single SQL query to fetch the last 12 effective dates for each participant
 query = '''
 WITH Ranked_EFCTV_DT AS (
